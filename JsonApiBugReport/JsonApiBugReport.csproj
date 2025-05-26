@@ -2,9 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<!--
 		<UseLatestJsonApiDotNetCoreVersion>True</UseLatestJsonApiDotNetCoreVersion>
-		-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(UseLatestJsonApiDotNetCoreVersion) == 'True'">

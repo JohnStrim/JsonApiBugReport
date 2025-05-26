@@ -13,11 +13,15 @@ public static class DbContextExtensions
 {
     public static IServiceCollection AddApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("ApplicationDb");
+        var connectionString = configuration.GetConnectionString("SqlServerDb");
         return services
             .AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(connectionString);
+
+#if DEBUG
+                options.EnableSensitiveDataLogging();
+#endif
             });
     }
 

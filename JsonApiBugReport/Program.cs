@@ -15,12 +15,14 @@ builder.Services
     .AddApplicationDbContext(builder.Configuration)
     .AddApiConfiguration();
 
-if (typeof(IIdentifiable).Assembly.GetName().Version >= new Version(5, 7,2))
+if (typeof(IIdentifiable).Assembly.GetName().Version >= new Version(5, 7, 2))
 {
     builder.Configuration.AddInMemoryCollection(new Dictionary<string, string>
     {
         ["Logging:LogLevel:JsonApiDotNetCore.Repositories"] = "Debug"
     });
+
+    builder.Services.AddTransient<IQueryableBuilder, PruningQueryableBuilder>();
 }
 else
 {

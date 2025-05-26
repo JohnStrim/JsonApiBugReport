@@ -1,3 +1,17 @@
 @HostAddress = https://localhost:7084
 
+### Basic query with includes (pruned)
+
 GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units
+
+### Single include for easier debugging of recursion
+
+GET {{HostAddress}}/PriceGroup?include=products
+
+### Sparse fieldset on subset of derived types
+
+GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&fields[Addon]=trialDuration,allowsCustomEndDate&fields[Bundle]=isTaxable
+
+### Non-default page size on top-level include
+
+GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&page[size]=products:5
