@@ -1,11 +1,8 @@
 
 using Bogus;
-using JsonApiBugReport.Data;
-using JsonApiBugReport.Data.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace JsonApiBugReport.Data.DummySeed;
@@ -27,6 +24,7 @@ public static class SeedData
 
             // Seed Users
             var userFaker = new Faker<User>()
+                .UseUtc()
                 .RuleFor(u => u.FirstName, f => f.Name.FirstName())
                 .RuleFor(u => u.LastName, f => f.Name.LastName())
                 .RuleFor(u => u.Email, f => f.Internet.Email())
@@ -40,6 +38,7 @@ public static class SeedData
 
             // Seed UnitGroups
             var unitGroupFaker = new Faker<UnitGroup>()
+                .UseUtc()
                 .RuleFor(ug => ug.Name, f => f.Commerce.Department())
                 .RuleFor(ug => ug.Description, f => f.Lorem.Sentence())
                 .RuleFor(ug => ug.IsActive, f => f.Random.Bool())
@@ -53,6 +52,7 @@ public static class SeedData
 
             // Seed Units
             var unitFaker = new Faker<Unit>()
+                .UseUtc()
                 .RuleFor(u => u.Name, f => f.Commerce.ProductName())
                 .RuleFor(u => u.Mnemonic, f => f.Random.AlphaNumeric(5))
                 .RuleFor(u => u.Quantity, f => f.Random.Decimal(1, 100))
@@ -65,6 +65,7 @@ public static class SeedData
 
             // Seed PriceGroups
             var priceGroupFaker = new Faker<PriceGroup>()
+                .UseUtc()
                 .RuleFor(pg => pg.Name, f => f.Commerce.Department())
                 .RuleFor(pg => pg.Description, f => f.Lorem.Sentence())
                 .RuleFor(pg => pg.CreatedAt, f => f.Date.Past())
@@ -77,6 +78,7 @@ public static class SeedData
 
             // Seed Products
             var productFaker = new Faker<Product>()
+                .UseUtc()
                 .RuleFor(p => p.Name, f => f.Commerce.ProductName())
                 .RuleFor(p => p.IsEnabled, f => f.Random.Bool())
                 .RuleFor(p => p.ShortDescription, f => f.Commerce.ProductDescription())
@@ -99,6 +101,7 @@ public static class SeedData
 
             // Seed ProductAddons
             var productAddonFaker = new Faker<ProductAddon>()
+                .UseUtc()
                 .RuleFor(pa => pa.Name, f => f.Commerce.ProductName())
                 .RuleFor(pa => pa.IsEnabled, f => f.Random.Bool())
                 .RuleFor(pa => pa.ShortDescription, f => f.Commerce.ProductDescription())
@@ -122,6 +125,7 @@ public static class SeedData
 
             // Seed ProductBundles
             var productBundleFaker = new Faker<ProductBundle>()
+                .UseUtc()
                 .RuleFor(pb => pb.Name, f => f.Commerce.ProductName())
                 .RuleFor(pb => pb.IsEnabled, f => f.Random.Bool())
                 .RuleFor(pb => pb.ShortDescription, f => f.Commerce.ProductDescription())
@@ -142,6 +146,7 @@ public static class SeedData
 
             // Seed ProductGroups
             var productGroupFaker = new Faker<ProductGroup>()
+                .UseUtc()
                 .RuleFor(pg => pg.Name, f => f.Commerce.ProductName())
                 .RuleFor(pg => pg.IsEnabled, f => f.Random.Bool())
                 .RuleFor(pg => pg.ShortDescription, f => f.Commerce.ProductDescription())
@@ -164,5 +169,15 @@ public static class SeedData
             // Save all changes to the database
             context.SaveChanges();
         }
+    }
+
+    private static Faker<T> UseUtc<T>(this Faker<T> faker)
+        where T : class
+    {
+        // Setting the system DateTime to kind Utc, so that faker calls like PastOffset() don't depend on the system time zone.
+        // See https://docs.microsoft.com/en-us/dotnet/api/system.datetimeoffset.op_implicit?view=net-6.0#remarks
+        faker.UseDateTimeReference(DateTime.UtcNow);
+
+        return faker;
     }
 }

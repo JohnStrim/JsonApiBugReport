@@ -1,9 +1,9 @@
-﻿using System;
+﻿#nullable disable
+
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
-namespace JsonApiBugReport.Migrations
+namespace JsonApiBugReport.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
