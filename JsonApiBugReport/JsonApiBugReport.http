@@ -8,10 +8,40 @@ GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units
 
 GET {{HostAddress}}/PriceGroup?include=products
 
-### Sparse fieldset on subset of derived types
+### Sparse fieldset on derived type Bundle
+
+GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&fields[Bundle]=isTaxable
+
+### Sparse fieldset on derived type Addon
+
+GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&fields[Addon]=trialDuration,allowsCustomEndDate
+
+### Sparse fieldset on subset of derived types [SLOW]
 
 GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&fields[Addon]=trialDuration,allowsCustomEndDate&fields[Bundle]=isTaxable
 
 ### Non-default page size on top-level include
 
 GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&page[size]=products:5
+
+### Filter on type hierarchy
+
+GET {{HostAddress}}/PriceGroup?include=products&filter[products]=equals(id,'FFFFFFFF-0000-0000-0000-FFFFFFFFFFFF')
+
+### Filter after type hierarchy [HAS NEVER WORKED]
+
+GET {{HostAddress}}/PriceGroup?include=products.unitGroup.units&filter[products.unitGroup.units]=equals(id,'FFFFFFFF-0000-0000-0000-FFFFFFFFFFFF')
+
+### ProductBase
+###     : CommonProduct
+###         : ProductBundle = "Bundle"
+###     : StandaloneProduct
+###         : Product
+###         : ProductAddon = "Addon"
+###     : ProductGroup
+###    
+###     HasOne: UnitGroup
+###     HasMany: Units
+###    
+### PriceGroup
+###     HasMany: Products

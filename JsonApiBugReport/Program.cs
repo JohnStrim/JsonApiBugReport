@@ -21,8 +21,6 @@ if (typeof(IIdentifiable).Assembly.GetName().Version >= new Version(5, 7, 2))
     {
         ["Logging:LogLevel:JsonApiDotNetCore.Repositories"] = "Debug"
     });
-
-    builder.Services.AddTransient<IQueryableBuilder, PruningQueryableBuilder>();
 }
 else
 {
