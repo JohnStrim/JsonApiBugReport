@@ -1,12 +1,11 @@
 ﻿using JsonApiBugReport.Data;
 using JsonApiDotNetCore.Configuration;
+using JsonApiDotNetCore.Resources;
 using JsonApiDotNetCore.Resources.Annotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace JsonApiBugReport.Extensions;
 
@@ -25,7 +24,8 @@ public static class ServiceCollectionExtensions
             .AddControllers();
 
         services
-            .AddJsonApiSpecification();
+            .AddJsonApiSpecification()
+            .AddResourceDefinitions();
 
         return services;
     }
@@ -61,5 +61,38 @@ public static class ServiceCollectionExtensions
 #endif
 
         return options;
+    }
+
+    private static IServiceCollection AddResourceDefinitions(this IServiceCollection services)
+    {
+        var dataAssembly = typeof(ApplicationDbContext).Assembly;
+        var identifiableType = typeof(IIdentifiable<>);
+        var commonDefinitionType = typeof(JsonApiBugReport.ResourceDefinitions.CommonDefinition<,>);
+        var resourceDefinitionType = typeof(IResourceDefinition<,>);
+
+        var resourceTypes = dataAssembly.GetTypes()
+            .Where(t =>
+                t.IsClass &&
+                !t.IsAbstract &&
+                t.Namespace == "JsonApiBugReport.Data" &&
+                t.GetInterfaces().Any(i =>
+                    i.IsGenericType &&
+                    i.GetGenericTypeDefinition() == identifiableType))
+            .ToList();
+
+        foreach (var resourceType in resourceTypes)
+        {
+            var identifiableInterface = resourceType.GetInterfaces()
+                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == identifiableType);
+
+            var idType = identifiableInterface.GetGenericArguments()[0];
+
+            var definitionType = commonDefinitionType.MakeGenericType(resourceType, idType);
+            var serviceType = resourceDefinitionType.MakeGenericType(resourceType, idType);
+
+            services.AddScoped(serviceType, definitionType);
+        }
+
+        return services;
     }
 }
